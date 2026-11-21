@@ -20,7 +20,7 @@
         <grpc.version>1.84.1</grpc.version>
         <protobuf.version>4.36.2</protobuf.version>
         <!-- Fixa uma versao corrigida do Guava (transitivo do gRPC): CVE-2026-102554 -->
-        <guava.version>33.7.2-android</guava.version>
+        <guava.version>33.8.0-android</guava.version>
     </properties>
 
     <dependencies>
