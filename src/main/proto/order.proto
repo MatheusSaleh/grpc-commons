@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+// Contrato gRPC compartilhado entre order-client e order-server.
+// Qualquer mudança aqui deve gerar uma nova versão (tag) deste repositório.
+
+package order;
+
+option java_multiple_files = true;
+option java_package = "br.com.exemplo.grpc";
+option java_outer_classname = "OrderProto";
+
+service OrderService {
+  // Recebe um pedido, persiste como PENDING e o publica na fila de processamento.
+  rpc PlaceOrder (OrderRequest) returns (OrderResponse);
+
+  // Consulta o status atual de um pedido no MongoDB.
+  rpc GetOrderStatus (GetOrderStatusRequest) returns (GetOrderStatusResponse);
+}
+
+message OrderRequest {
+  string orderId = 1;
+  string customerName = 2;
+  repeated OrderItem items = 3;
+  double totalAmount = 4;
+  string timestamp = 5;
+}
+
+message OrderItem {
+  string productId = 1;
+  string productName = 2;
+  int32 quantity = 3;
+  double price = 4;
+}
+
+message OrderResponse {
+  string orderId = 1;
+  string status = 2; // RECEIVED, PROCESSING, COMPLETED, FAILED
+  string message = 3;
+}
+
+message GetOrderStatusRequest {
+  string order_id = 1;
+}
+
+message GetOrderStatusResponse {
+  string order_id = 1;
+  string status = 2;
+  string last_updated = 3;
+  repeated OrderItem items = 4;
+  string customer_name = 5;
+  double total_amount = 6;
+}

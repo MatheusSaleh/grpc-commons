@@ -1,51 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>br.com.exemplo</groupId>
-    <artifactId>meu-projeto</artifactId>
+    <!-- Coordenadas no formato do JitPack: com.github.<usuario>:<repositorio>:<tag> -->
+    <groupId>com.github.MatheusSaleh</groupId>
+    <artifactId>grpc-commons</artifactId>
     <version>1.0.0</version>
-    <packaging>pom</packaging>
-    <name>Projeto Pai - Sistema de Pedidos</name>
+    <packaging>jar</packaging>
 
-    <modules>
-        <module>grpc-commons</module>
-        <module>order-server</module>
-    </modules>
+    <name>grpc-commons</name>
+    <description>Contrato gRPC (Protobuf) compartilhado pelos servicos de pedidos</description>
 
     <properties>
-        <java.version>21</java.version>
-        <spring.boot.version>3.2.0</spring.boot.version>
-        <grpc.version>2.15.0</grpc.version>
-        <protobuf.version>0.6.1</protobuf.version>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Alinhado com o BOM do Spring Boot 4.2 usado pelos servicos -->
+        <grpc.version>1.84.1</grpc.version>
+        <protobuf.version>4.36.2</protobuf.version>
+        <!-- Fixa uma versao corrigida do Guava (transitivo do gRPC): CVE-2026-102554 -->
+        <guava.version>33.7.2-android</guava.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- Gerenciamento das versões padrão -->
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-protobuf</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-stub</artifactId>
+            <version>${grpc.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <!-- Plugin do protobuf (para grpc-commons) -->
-                <plugin>
-                    <groupId>org.xolstice.maven.plugins</groupId>
-                    <artifactId>protobuf-maven-plugin</artifactId>
-                    <version>${protobuf.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.1</version>
+            </extension>
+        </extensions>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.6.1</version>
+                <configuration>
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Evita dependencia de javax/jakarta.annotation.Generated -->
+                            <pluginParameter>@generated=omit</pluginParameter>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
-
 </project>
