@@ -17,7 +17,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- Alinhado com o BOM do Spring Boot 4.2 usado pelos servicos -->
-        <grpc.version>1.84.1</grpc.version>
+        <grpc.version>1.85.1</grpc.version>
         <protobuf.version>4.36.2</protobuf.version>
         <!-- Fixa uma versao corrigida do Guava (transitivo do gRPC): CVE-2026-102554 -->
         <guava.version>33.7.2-android</guava.version>
